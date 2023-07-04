@@ -39,28 +39,36 @@ class ArticleRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Article[] Returns an array of Article objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('a.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * @return Article Returns an array of Article objects
+     */
+    public function findArticleByShop($id, $shopId): Article|null
+    {
+        return $this->createQueryBuilder('a')
+            ->select('a.id', 'a.nom', 'a.prix', 'ba.stock', 'ba.tarifLocationJour')
+            ->innerJoin('a.boutiques', 'ba')
+            ->andWhere('ba.boutique = :shopId')
+            ->setParameter('shopId', $shopId)
+            ->andWhere('a.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 
-//    public function findOneBySomeField($value): ?Article
-//    {
-//        return $this->createQueryBuilder('a')
-//            ->andWhere('a.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * @return Article[] Returns an array of Article objects
+     */
+    public function findArticlesByShop($value): array
+    {
+        return $this->createQueryBuilder('a')
+            ->select('a.id', 'a.nom', 'a.prix', 'ba.stock', 'ba.tarifLocationJour')
+            ->innerJoin('a.boutiques', 'ba')
+            ->andWhere('ba.boutique = :val')
+            ->setParameter('val', $value)
+            ->orderBy('a.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

@@ -4,10 +4,10 @@ namespace App\Entity;
 
 use App\Entity\Boutique;
 use App\Entity\Article;
-use App\Repository\BoutiqueUtilisateurRepository;
+use App\Repository\BoutiqueArticleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: BoutiqueUtilisateurRepository::class)]
+#[ORM\Entity(repositoryClass: BoutiqueArticleRepository::class)]
 class BoutiqueArticle
 {
     #[ORM\Id]
@@ -21,11 +21,11 @@ class BoutiqueArticle
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $tarifLocationJour = 0;
 
-    #[ORM\ManyToOne(targetEntity: 'Boutique')]
+    #[ORM\ManyToOne(targetEntity: Boutique::class, inversedBy: 'articles')]
     #[ORM\JoinColumn(nullable: false)]
     private Boutique $boutique;
 
-    #[ORM\ManyToOne(targetEntity: 'Article')]
+    #[ORM\ManyToOne(targetEntity: Article::class, inversedBy: 'boutiques')]
     #[ORM\JoinColumn(nullable: false)]
     private Article $article;
     
@@ -33,18 +33,6 @@ class BoutiqueArticle
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getNom(): string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): static
-    {
-        $this->nom = $nom;
-
-        return $this;
     }
     
     public function getStock(): ?int
@@ -80,17 +68,17 @@ class BoutiqueArticle
     {
         $this->boutique = $boutique;
         
-        return $this;
+        return $this->boutique;
     }
     
-    public function getUtilisateur(): Uilisateur
+    public function getArticle(): Article
     {
-        return $this->utilisateur;
+        return $this->article;
     }
-    public function setUtilisateur($utilisateur): Utilisateur
+    public function setArticle($article): Article
     {
-        $this->utilisateur = $utilisateur;
+        $this->article = $article;
 
-        return $this;
+        return $this->article;
     }
 }

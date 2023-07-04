@@ -42,9 +42,8 @@ class ArticleController extends AbstractController
                 'prix' => $item->getPrix()
             ];
         }
-
-//        return $this->json($data);
-        return new JsonResponse($data, Response::HTTP_CREATED);
+        
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
 
@@ -70,20 +69,22 @@ class ArticleController extends AbstractController
             'nom' => $item->getNom(),
             'prix' => $item->getPrix()
         ];
-
-        //return $this->json($data);
+        
         return new JsonResponse($data, Response::HTTP_CREATED);
     }
 
 
-    #[Route('/articles/{id}', name: 'article_show', methods:['get'] )]
+    #[Route('/article/{id}', name: 'article_show', methods:['get'] )]
     public function show(ManagerRegistry $doctrine, int $id): JsonResponse
     {
         $item = $doctrine->getRepository(Article::class)->find($id);
 
         if (!$item) {
-
-            return $this->json('No article found for id ' . $id, 404);
+            $error = [
+                'code' => '404',
+                'error' => 'Article introuvable'
+            ];
+            return new JsonResponse($error, 404);
         }
 
         $data =  [
@@ -92,17 +93,21 @@ class ArticleController extends AbstractController
             'prix' => $item->getPrix()
         ];
 
-        return $this->json($data);
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route('/articles/{id}', name: 'article_update', methods:['put', 'patch'] )]
+    #[Route('/article/{id}', name: 'article_update', methods:['put', 'patch'] )]
     public function update(ManagerRegistry $doctrine, Request $request, int $id): JsonResponse
     {
         $entityManager = $doctrine->getManager();
         $item = $entityManager->getRepository(Article::class)->find($id);
 
         if (!$item) {
-            return $this->json('No article found for id' . $id, 404);
+            $error = [
+                'code' => '404',
+                'error' => 'Article introuvable'
+            ];
+            return new JsonResponse($error, 404);
         }
 
         $item->setNom($request->request->get('nom'));
@@ -115,22 +120,26 @@ class ArticleController extends AbstractController
             'prix' => $item->getPrix()
         ];
 
-        return $this->json($data);
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 
-    #[Route('/articles/{id}', name: 'article_delete', methods:['delete'] )]
+    #[Route('/article/{id}', name: 'article_delete', methods:['delete'] )]
     public function delete(ManagerRegistry $doctrine, int $id): JsonResponse
     {
         $entityManager = $doctrine->getManager();
         $item = $entityManager->getRepository(Article::class)->find($id);
 
         if (!$item) {
-            return $this->json('No article found for id' . $id, 404);
+            $error = [
+                'code' => '404',
+                'error' => 'Article introuvable'
+            ];
+            return new JsonResponse($error, 404);
         }
 
         $entityManager->remove($item);
         $entityManager->flush();
-
-        return $this->json('Deleted article successfully with id ' . $id);
+        
+        return new JsonResponse('Deleted article successfully with id ' . $id, Response::HTTP_OK);
     }
 }

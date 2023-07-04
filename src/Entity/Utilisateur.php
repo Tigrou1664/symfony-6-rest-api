@@ -2,9 +2,10 @@
 
 namespace App\Entity;
 
+use App\Entity\Boutique;
 use App\Repository\UtilisateurRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -45,6 +46,14 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private array $roles = ['ROLE_USER'];
 
+    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: BoutiqueUtilisateur::class)]
+    private $boutiques;
+
+    public function __construct()
+    {
+        $this->boutiques = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -78,8 +87,8 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_VENDOR
-        $roles[] = 'ROLE_VENDOR';
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
     }
@@ -141,5 +150,27 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    /**
+     * @return ArrayCollection|Boutique[]
+     */
+    public function getBoutiques(): ArrayCollection
+    {
+        return $this->boutiques;
+    }
+    public function addBoutique(Boutique $boutique)
+    {
+        if (!$this->boutiques->contains($boutique)) {
+            $this->boutiques[] = $boutique;
+            $boutique->addPersonnel($this);
+        }
+    }
+    public function removeBoutique(Boutique $boutique)
+    {
+        if ($this->boutiques->contains($boutique)) {
+            $this->boutiques->removeElement($boutique);
+            $boutique->removePersonnel($this);
+        }
     }
 }

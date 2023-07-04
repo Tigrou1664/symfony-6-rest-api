@@ -16,39 +16,31 @@ class TestFixtures extends Fixture
     public function load(ObjectManager $manager)
     {
         // Create admins & vendors
-        $user = new Utilisateur();
-        $user->setLogin('admin1');
-        $user->setPlainPassword('admin1');
-        $user->setDisplayName('Admin 1');
-        $user->setRoles(["ROLE_ADMIN"]);
-        $manager->persist($user);
-        $this->addReference('admin1', $user);
+        for ($i = 1; $i <= 2; $i++) {
+            $user = new Utilisateur();
+            $user->setLogin('admin'.$i);
+            $user->setPlainPassword('admin'.$i);
+            $user->setDisplayName('Admin '.$i);
+            $user->setRoles(["ROLE_ADMIN"]);
+            $manager->persist($user);
+            $this->addReference('admin'.$i, $user);
+        }
 
-        $user = new Utilisateur();
-        $user->setLogin('admin2');
-        $user->setPlainPassword('admin2');
-        $user->setDisplayName('Admin 2');
-        $user->setRoles(["ROLE_ADMIN"]);
-        $manager->persist($user);
-
-        $user = new Utilisateur();
-        $user->setLogin('vendor1');
-        $user->setPlainPassword('vendor1');
-        $user->setDisplayName('Vendeur 1');
-        $user->setRoles(["ROLE_ADMIN"]);
-        $manager->persist($user);
-        $this->addReference('vendor1', $user);
-
-        $user = new Utilisateur();
-        $user->setLogin('vendor2');
-        $user->setPlainPassword('vendor2');
-        $user->setDisplayName('Vendeur 2');
-        $user->setRoles(["ROLE_ADMIN"]);
-        $manager->persist($user);
+        for ($i = 1; $i <= 2; $i++) {
+            $user = new Utilisateur();
+            $user->setLogin('vendor'.$i);
+            $user->setPlainPassword('vendor'.$i);
+            $user->setDisplayName('Vendeur '.$i);
+            $user->setRoles(["ROLE_ADMIN"]);
+            $manager->persist($user);
+            $this->addReference('vendor'.$i, $user);
+        }
         
         // Create shops
         $shop = new Boutique();
         $shop->setNom('Paris');
+        // $shop->addAdmin($this->getReference('admin1'));
+        // $shop->addVendor($this->getReference('vendor1'));
         $manager->persist($shop);
         $this->addReference('shop1', $shop);
 
@@ -57,17 +49,17 @@ class TestFixtures extends Fixture
         $manager->persist($shop);
 
         // Set admin1 et vendor1 to boutique1
-//        $relation = new BoutiqueUtilisateur();
-//        $relation->setBoutique($this->getReference('shop1'));
-//        $relation->setUtilisateur($this->getReference('admin1'));
-//        $relation->setRole(RoleType::ROLE_ADMIN);
-//        $manager->persist($relation);
-//
-//        $relation = new BoutiqueUtilisateur();
-//        $relation->setBoutique($this->getReference('shop1'));
-//        $relation->setUtilisateur($this->getReference('vendor1'));
-//        $relation->setRole(RoleType::ROLE_VENDOR);
-//        $manager->persist($relation);
+        $relation = new BoutiqueUtilisateur();
+        $relation->setBoutique($this->getReference('shop1'));
+        $relation->setUtilisateur($this->getReference('admin1'));
+        $relation->setRole(RoleType::ROLE_ADMIN);
+        $manager->persist($relation);
+
+        $relation = new BoutiqueUtilisateur();
+        $relation->setBoutique($this->getReference('shop1'));
+        $relation->setUtilisateur($this->getReference('vendor1'));
+        $relation->setRole(RoleType::ROLE_VENDOR);
+        $manager->persist($relation);
         
         // Create articles
         $article = new Article();
@@ -88,19 +80,19 @@ class TestFixtures extends Fixture
         $this->addReference('article3', $article);
 
         // Set article1 & article3 to boutique1
-//        $relation = new BoutiqueArticle();
-//        $relation->setBoutique($this->getReference('shop1'));
-//        $relation->setArticle($this->getReference('article1'));
-//        $relation->setStock(10);
-//        $relation->setTarifLocationJour(25);
-//        $manager->persist($relation);
-//
-//        $relation = new BoutiqueArticle();
-//        $relation->setBoutique($this->getReference('shop1'));
-//        $relation->setArticle($this->getReference('article3'));
-//        $relation->setStock(20);
-//        $relation->setTarifLocationJour(5);
-//        $manager->persist($relation);
+        $relation = new BoutiqueArticle();
+        $relation->setBoutique($this->getReference('shop1'));
+        $relation->setArticle($this->getReference('article1'));
+        $relation->setStock(10);
+        $relation->setTarifLocationJour(25);
+        $manager->persist($relation);
+
+        $relation = new BoutiqueArticle();
+        $relation->setBoutique($this->getReference('shop1'));
+        $relation->setArticle($this->getReference('article3'));
+        $relation->setStock(20);
+        $relation->setTarifLocationJour(5);
+        $manager->persist($relation);
         
         $manager->flush();
     }

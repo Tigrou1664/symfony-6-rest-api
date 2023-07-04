@@ -2,9 +2,14 @@
 
 namespace App\Entity;
 
+use App\DBAL\Types\RoleType;
+use App\Entity\Article;
+use App\Entity\BoutiqueArticle;
+use App\Entity\BoutiqueUtilisateur;
+use App\Entity\Utilisateur;
 use App\Repository\BoutiqueRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -25,6 +30,15 @@ class Boutique
     #[ORM\OneToMany(mappedBy: 'boutique', targetEntity: BoutiqueUtilisateur::class)]
     private $personnel;
 
+    #[ORM\OneToMany(mappedBy: 'boutique', targetEntity: BoutiqueArticle::class)]
+    private $articles;
+
+    public function __construct()
+    {
+        $this->personnel = new ArrayCollection();
+        $this->articles = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -42,18 +56,75 @@ class Boutique
         return $this;
     }
 
-    public function getUtilisateurs(): Collection
+    /**
+     * @return ArrayCollection|Utilisateur[]
+     */
+    public function getPersonnel(): Collection
     {
         return $this->personnel;
     }
 
-    public function addUtilisateur(Utilisateur $utilisateur): self
+    public function addPersonnel(Utilisateur $utilisateur)
     {
         if (!$this->personnel->contains($utilisateur)) {
             $this->personnel[] = $utilisateur;
-            $utilisateur->setOwner($this);
+            $utilisateur->addBoutique($this);
         }
+    }
 
-        return $this;
+    public function addVendor(Utilisateur $utilisateur)
+    {
+        if (!$this->personnel->contains($utilisateur)) {
+            $this->personnel[] = $utilisateur;
+            $utilisateur->addBoutique($this);
+//            $relation = new BoutiqueUtilisateur();
+//            $relation->setBoutique($this);
+//            $relation->setUtilisateur($utilisateur);
+//            $relation->setRole(RoleType::ROLE_VENDOR);
+        }
+    }
+
+    public function addAdmin(Utilisateur $utilisateur)
+    {
+        if (!$this->personnel->contains($utilisateur)) {
+            $this->personnel[] = $utilisateur;
+            $utilisateur->addBoutique($this);
+//            $relation = new BoutiqueUtilisateur();
+//            $relation->setBoutique($this);
+//            $relation->setUtilisateur($utilisateur);
+//            $relation->setRole(RoleType::ROLE_ADMIN);
+//            $relation->
+        }
+    }
+
+    public function removePersonnel(Utilisateur $user)
+    {
+        if ($this->personnel->contains($user)) {
+            $this->personnel->removeElement($user);
+            // not needed for persistence, just keeping both sides in sync
+            $user->removeBoutique($this);
+        }
+    }
+
+    /**
+     * @return ArrayCollection|Article[]
+     */
+    public function getArticles(): ArrayCollection
+    {
+        return $this->articles;
+    }
+    public function addArticle(Article $article)
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles[] = $article;
+            $article->addBoutique($this);
+        }
+    }
+    public function removeBoutique(Article $article)
+    {
+        if ($this->articles->contains($article)) {
+            $this->articles->removeElement($article);
+            $article->removeBoutique($this);
+        }
     }
 }
