@@ -14,9 +14,12 @@ $ php bin/console doctrine:migrations:migrate
 
 # Insert fixtures
 * php bin/console doctrine:fixtures:load
+
+# Doc
+http://localhost:8000/api/doc
 ```
 
 ## Known problems
 
-- bug fixtures
-- relations not complete
+- problem with ManyToMany relation with extra field
+- missing tests
